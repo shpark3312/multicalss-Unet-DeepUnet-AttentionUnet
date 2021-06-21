@@ -9,7 +9,6 @@ import matplotlib.pyplot as plt
 
 def train(parser_args):
 
-    os.environ["CUDA_VISIBLE_DEVICES"] = parser_args.gpu
     SIZE_X = parser_args.img_size[0]
     SIZE_Y = parser_args.img_size[1]
     IMG_CHANNELS = parser_args.img_size[2]

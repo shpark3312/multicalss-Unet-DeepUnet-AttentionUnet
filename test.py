@@ -19,7 +19,6 @@ import random
 
 def test(parser_args):
 
-    os.environ["CUDA_VISIBLE_DEVICES"] = parser_args.gpu
     model_path = parser_args.model_path
     SIZE_X = parser_args.img_size[0]
     SIZE_Y = parser_args.img_size[1]
