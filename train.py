@@ -1,15 +1,9 @@
-from model import multi_unet_model
+
 import tensorflow as tf
-from tensorflow.keras.utils import normalize, to_categorical
-import tensorflow.keras.backend as K
 import os
-import cv2
 import numpy as np
-from sklearn.utils import class_weight
 from sklearn.model_selection import train_test_split
-import matplotlib
 from utils import *
-import random
 import matplotlib.pyplot as plt
 
 

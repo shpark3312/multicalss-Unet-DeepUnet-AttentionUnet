@@ -1,11 +1,10 @@
 
-from tensorflow.keras.metrics import MeanIoU
+from inspect import TPFLAGS_IS_ABSTRACT
+from tensorflow.keras.metrics import MeanIoU, Precision, Recall
 import os
-import cv2
 import numpy as np
 from matplotlib import pyplot as plt
 from train import get_model
-import random
 import matplotlib
 from utils import *
 
@@ -46,21 +45,55 @@ def eval(parser_args):
     #Using built in keras function
 
     IOU_keras = MeanIoU(num_classes=n_classes)
+    precision_keras = Precision()
+    recall_keras = Recall()
+
     IOU_keras.update_state(data_Y[:,:,:,0], y_pred_argmax)
-    print("Mean IoU =", IOU_keras.result().numpy())
+    precision_keras.update_state(data_Y[:,:,:,0], y_pred_argmax)
+    recall_keras.update_state(data_Y[:,:,:,0], y_pred_argmax)
+
+    print("Mean IoU       =", IOU_keras.result().numpy())
+    print("Mean precision =", precision_keras.result().numpy())
+    print("Mean recall    =", recall_keras.result().numpy())
+
+    IOU_keras.
 
 
     #To calculate I0U for each class...
     values = np.array(IOU_keras.get_weights()).reshape(n_classes, n_classes)
     print(values)
-    IoU_by_classes = []
+    precision_by_classes, recall_by_classes, IoU_by_classes, accuracy_by_classes = []
+
+    FN, FP, TP, TN = 0, 0, 0, 0
 
     for i in n_classes:
-        Iou = values[i,0]/(values[i,0] + values[i,1] + values[i,2] + values[i,3] + values[1,i]+ values[2,i]+ values[3,i])
+        for j in n_classes:
+            if i == j:
+                continue
+            FN += values[i,j]
+            FP += values[j,i]
+        TP = values[i,i]
+        TN = np.trace(values) - TP
+
+        precision = TP/(TP+FP)
+        recall = TP/(TP+FN)
+        IoU = TP/(TP+FN+FP)
+        accuracy = (TP+TN)/(TP+TN+FP+FN)
+
+        precision_by_classes.append(precision)
+        recall_by_classes.append(precision)
+        IoU_by_classes.append(precision)
+        accuracy_by_classes.append(precision)
+
+
+
+
+        Iou = values[i,i]/(values[i,i] + values[i,1] + values[i,2] + values[i,3] + values[1,i]+ values[2,i]+ values[3,i])
+        precision = values[i,0]/(values[i,0] + values[i,1])
         IoU_by_classes.append(Iou)
         print(f"Iou for class {i} is : {Iou}")
 
-    class1_IoU = values[i,0]/(values[i,0] + values[i,1] + values[i,2] + values[i,3] + values[1,i]+ values[2,i]+ values[3,i])
+    class1_IoU = values[i,i]/(values[i,i] + values[i,1] + values[i,2] + values[i,3] + values[1,i]+ values[2,i]+ values[3,i])
     class2_IoU = values[1,1]/(values[1,1] + values[1,0] + values[1,2] + values[1,3] + values[0,1]+ values[2,1]+ values[3,1])
     class3_IoU = values[2,2]/(values[2,2] + values[2,0] + values[2,1] + values[2,3] + values[0,2]+ values[1,2]+ values[3,2])
     class4_IoU = values[3,3]/(values[3,3] + values[3,0] + values[3,1] + values[3,2] + values[0,3]+ values[1,3]+ values[2,3])

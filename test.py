@@ -26,7 +26,6 @@ def test(parser_args):
     IMG_CHANNELS = parser_args.img_size[2]
     n_classes = parser_args.class_num
     save_dir = parser_args.save_dir
-
     plot_img = False
 
     viridis = matplotlib.cm.get_cmap('viridis', 256)
@@ -36,7 +35,6 @@ def test(parser_args):
 
     model = get_model(n_classes, SIZE_X, SIZE_Y, IMG_CHANNELS)
     model.load_weights(model_path)
-
 
     im_names = [f for f in os.listdir(im_dir) if f[-4:] == ".png"]
 
