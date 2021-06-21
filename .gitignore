@@ -1,0 +1,43 @@
+__pycache__/
+.vscode/*
+
+# image files
+*.tif
+*.tiff
+*.png
+*.jpg
+*.jpeg
+*.gif
+
+#label files
+*.csv
+*.txt
+*.xml
+*.yaml
+*.cpg
+*.dbf
+*.sbn
+*.shp
+*.xml
+*.sbx
+*shx
+
+*.md
+README
+.DS_Store
+
+#video files
+*.ts
+*.mp4
+*.json
+*.mov
+
+#model weights
+*.h5
+*.pkl
+*.hdf5
+
+#etc
+*.csv
+*.zip
+*.ttf
