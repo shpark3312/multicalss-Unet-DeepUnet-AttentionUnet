@@ -83,7 +83,7 @@ class DataGenerator(tf.keras.utils.Sequence):
 
 
 
-def weightedLoss(originalLossFunc, weightsList):
+def weightedLoss(originalLossFunc, weightsList, mask):
     def lossFunc(true, pred):
         axis = -1
         classSelectors = K.argmax(true, axis=axis)
@@ -98,8 +98,11 @@ def weightedLoss(originalLossFunc, weightsList):
             weightMultiplier = weightMultiplier + weights[i]
 
         loss = originalLossFunc(true,pred)
-        loss = loss * weightMultiplier
+        loss *= weightMultiplier
 
+        if mask:
+            label_mask = np.where(true == 0, 0, 1)
+            loss *= label_mask
         return loss
     return lossFunc
 
@@ -144,3 +147,52 @@ def read_images(dirs, names, n_classes, compute_cl_weights):
         return x, y_cat, class_weights
     else:
         return x, y_cat
+
+def get_apci_from_cm(cm, n_classes, mask):
+    precision_by_classes, recall_by_classes, IoU_by_classes, accuracy_by_classes = [], [], [], []
+
+    FN, FP, TP, TN = 0, 0, 0, 0
+
+    if mask:
+        for i in range(1, n_classes):
+            for j in range(1, n_classes):
+                if i == j:
+                    continue
+                FN += cm[i,j]
+                FP += cm[j,i]
+                
+            TP = cm[i,i]
+            TN = np.trace(cm) - TP - cm[0,0]
+
+            precision = TP/(TP+FP)
+            recall = TP/(TP+FN)
+            IoU = TP/(TP+FN+FP)
+            accuracy = (TP+TN)/(TP+TN+FP+FN)
+
+            precision_by_classes.append(precision)
+            recall_by_classes.append(recall)
+            IoU_by_classes.append(IoU)
+            accuracy_by_classes.append(accuracy)
+
+            print(f"Class {i} | IoU = {IoU:.3f}, Precision = {precision:.3f}, recall = {recall:.3f}, accuracy = {accuracy:.3f}")
+    else:
+        for i in range(n_classes):
+            for j in range(n_classes):
+                if i == j:
+                    continue
+                FN += cm[i,j]
+                FP += cm[j,i]
+            TP = cm[i,i]
+            TN = np.trace(cm) - TP
+
+            precision = TP/(TP+FP)
+            recall = TP/(TP+FN)
+            IoU = TP/(TP+FN+FP)
+            accuracy = (TP+TN)/(TP+TN+FP+FN)
+
+            precision_by_classes.append(precision)
+            recall_by_classes.append(recall)
+            IoU_by_classes.append(IoU)
+            accuracy_by_classes.append(accuracy)
+
+            print(f"Class {i} | IoU = {IoU:.3f}, Precision = {precision:.3f}, recall = {recall:.3f}, accuracy = {accuracy:.3f}")

@@ -16,17 +16,20 @@ def train(parser_args):
     batch_size = parser_args.batch_size
     epochs = parser_args.epochs
     get_class_weights = parser_args.class_weights
+    mask = parser_args.mask
 
     dirs = {'im_dir' : parser_args.img_dir, 'label_dir': parser_args.label_dir}
 
     im_names = [f for f in os.listdir(dirs['im_dir']) if f[-4:] == ".png"]
-    im_names = im_names[0:len(im_names):10]
+    # im_names = im_names[0:len(im_names):10]
 
     class_weights = {0:1.47170879e-01, 1:1.04067896e+02, 2:5.23742906e+01, 3:1.56621161e+02, 4:1.47537983e+01, 5:1.99087760e+03, 6:9.82233808e+00}
     class_weights = [1.47170879e-01, 1.04067896e+02, 5.23742906e+01, 1.56621161e+02, 1.47537983e+01, 1.99087760e+03, 9.82233808e+00]
 
     if get_class_weights:
         _, _, class_weights = read_images(dirs, im_names, n_classes, compute_cl_weights = get_class_weights)
+    else:
+        class_weights = [1 for i in range(n_classes)]
 
     train_names, val_names = train_test_split(im_names, test_size = 0.2, random_state = 0)
 
@@ -36,11 +39,7 @@ def train(parser_args):
     print(f'train images = {tot_batch_num_train}, validation images = {tot_batch_num_val}')
 
     model = get_model(n_classes, SIZE_X, SIZE_Y, IMG_CHANNELS)
-
-    if get_class_weights:
-        model.compile(loss= weightedLoss(tf.keras.losses.categorical_crossentropy, class_weights), optimizer='adam', metrics = ['accuracy'])
-    else:
-        model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+    model.compile(loss= weightedLoss(tf.keras.losses.categorical_crossentropy, class_weights, mask), optimizer='adam', metrics = ['accuracy'])
 
     model.summary()
 

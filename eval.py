@@ -19,6 +19,7 @@ def eval(parser_args):
     IMG_CHANNELS = parser_args.img_size[2]
     n_classes = parser_args.class_num
     # save_dir = parser_args.save_dir
+    mask = parser_args.mask
 
     plot_img = False
 
@@ -45,32 +46,7 @@ def eval(parser_args):
     IOU_keras = MeanIoU(num_classes=n_classes)
     IOU_keras.update_state(data_Y, y_pred_argmax)
 
-    print("Mean IoU       =", IOU_keras.result().numpy())
+    cm = np.array(IOU_keras.get_weights()).reshape(n_classes, n_classes)
+    print(cm)
 
-    #To calculate I0U for each class...
-    values = np.array(IOU_keras.get_weights()).reshape(n_classes, n_classes)
-    print(values)
-    precision_by_classes, recall_by_classes, IoU_by_classes, accuracy_by_classes = [], [], [], []
-
-    FN, FP, TP, TN = 0, 0, 0, 0
-
-    for i in range(n_classes):
-        for j in range(n_classes):
-            if i == j:
-                continue
-            FN += values[i,j]
-            FP += values[j,i]
-        TP = values[i,i]
-        TN = np.trace(values) - TP
-
-        precision = TP/(TP+FP)
-        recall = TP/(TP+FN)
-        IoU = TP/(TP+FN+FP)
-        accuracy = (TP+TN)/(TP+TN+FP+FN)
-
-        precision_by_classes.append(precision)
-        recall_by_classes.append(recall)
-        IoU_by_classes.append(IoU)
-        accuracy_by_classes.append(accuracy)
-
-        print(f"Class {i} | IoU = {IoU:.3f}, Precision = {precision:.3f}, recall = {recall:.3f}, accuracy = {accuracy:.3f}")
+    get_apci_from_cm(cm, n_classes)

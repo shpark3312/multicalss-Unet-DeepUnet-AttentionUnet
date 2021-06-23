@@ -19,8 +19,10 @@ if __name__== '__main__':
     train_parser.add_argument('--batch_size', type=int, default=16, help='total batch size for all GPUs')
     train_parser.add_argument('--class_num', type=int, help='total class number including background')
     train_parser.add_argument("--class_weights", action='store_true', help="compute class_weights while training", dest="class_weights")
+    train_parser.add_argument("--mask", action='store_true', help="apply mask while computing loss function", dest="mask")
     train_parser.add_argument("--model_dir", help="Set out model path", default="./weights/")
     train_parser.add_argument("--gpu", help="Set gpu number", default="0", dest="gpu")
+
 
     test_parser = subparsers.add_parser("test")
     test_parser.add_argument("--img_dir", help="Set in-image path")
@@ -35,6 +37,7 @@ if __name__== '__main__':
     val_parser.add_argument("--label_dir", help="Set in-image path")
     val_parser.add_argument("--model_path", help="Set trained model path")
     val_parser.add_argument('--class_num', type=int, help='total class number including background')
+    val_parser.add_argument("--mask", action='store_true', help="apply mask while evaluating model", dest="mask")
     val_parser.add_argument('--img-size', nargs='+', type=int, default = [512, 512, 3], help='model input size for training')
     val_parser.add_argument("--gpu", help="Set gpu number", default="0", dest="gpu")
 
