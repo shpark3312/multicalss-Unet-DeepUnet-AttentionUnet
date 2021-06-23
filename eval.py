@@ -7,7 +7,7 @@ from matplotlib import pyplot as plt
 from train import get_model
 import matplotlib
 from utils import *
-
+from sklearn.metrics import multilabel_confusion_matrix
 
 
 
@@ -29,7 +29,7 @@ def eval(parser_args):
 
     dirs = {'im_dir' : parser_args.img_dir, 'label_dir': parser_args.label_dir}
     im_names = [f for f in os.listdir(dirs['im_dir']) if f[-4:] == ".png"]
-    # data_X, data_Y = read_images(dirs, im_names[0:10:len(im_names)], n_classes, compute_cl_weights=False)
+    # data_X, data_Y = read_images(dirs, im_names[0:len(im_names):10], n_classes, compute_cl_weights=False)
     data_X, data_Y = read_images(dirs, im_names, n_classes, compute_cl_weights=False)
 
     model = get_model(n_classes, SIZE_X, SIZE_Y, IMG_CHANNELS)
@@ -39,6 +39,8 @@ def eval(parser_args):
     y_pred_argmax = np.argmax(y_pred, axis=3)
     data_Y = np.argmax(data_Y, axis=3)
 
+    # print(data_Y.shape)
+    # input(y_pred_argmax.shape)
 
     IOU_keras = MeanIoU(num_classes=n_classes)
     IOU_keras.update_state(data_Y, y_pred_argmax)

@@ -20,21 +20,20 @@ def train(parser_args):
     dirs = {'im_dir' : parser_args.img_dir, 'label_dir': parser_args.label_dir}
 
     im_names = [f for f in os.listdir(dirs['im_dir']) if f[-4:] == ".png"]
+    im_names = im_names[0:len(im_names):10]
 
     class_weights = {0:1.47170879e-01, 1:1.04067896e+02, 2:5.23742906e+01, 3:1.56621161e+02, 4:1.47537983e+01, 5:1.99087760e+03, 6:9.82233808e+00}
     class_weights = [1.47170879e-01, 1.04067896e+02, 5.23742906e+01, 1.56621161e+02, 1.47537983e+01, 1.99087760e+03, 9.82233808e+00]
 
     if get_class_weights:
-        data_X, data_Y, class_weights = read_images(dirs, im_names, n_classes, compute_cl_weights=get_class_weights)
-    else:
-        data_X, data_Y = read_images(dirs, im_names, n_classes, compute_cl_weights=get_class_weights)
+        _, _, class_weights = read_images(dirs, im_names, n_classes, compute_cl_weights = get_class_weights)
 
-    train_data_X, val_data_X, train_data_Y, val_data_Y = train_test_split(data_X, data_Y, test_size = 0.2, random_state = 0)
+    train_names, val_names = train_test_split(im_names, test_size = 0.2, random_state = 0)
 
-    print(f'train images = {len(train_data_X)}, val images = {len(val_data_X)}')
+    tot_batch_num_train = int(np.floor(len(train_names) / batch_size))
+    tot_batch_num_val = int(np.floor(len(val_names) / batch_size))
 
-    tot_batch_num_train = int(np.ceil(len(train_data_X) / batch_size))
-    tot_batch_num_val = int(np.ceil(len(val_data_X) / batch_size))
+    print(f'train images = {tot_batch_num_train}, validation images = {tot_batch_num_val}')
 
     model = get_model(n_classes, SIZE_X, SIZE_Y, IMG_CHANNELS)
 
@@ -45,21 +44,16 @@ def train(parser_args):
 
     model.summary()
 
-    # train_gen = DataGenerator(train_names, batch_size, n_classes, dirs, shuffle = True)
-    # val_gen = DataGenerator(val_names, batch_size, n_classes, dirs, shuffle = False)
+    train_gen = DataGenerator(train_names, batch_size, n_classes, dirs, shuffle = False)
+    val_gen = DataGenerator(train_names, batch_size, n_classes, dirs, shuffle = False)
 
-
-    history = model.fit(train_data_X,
-                        train_data_Y,
+    history = model.fit(train_gen,
                         verbose=1,
                         epochs=epochs,
-                        batch_size = 8,
-                        # steps_per_epoch=tot_batch_num_train,
-                        # validation_steps=tot_batch_num_val,
-                        validation_data=(val_data_X, val_data_Y),
-                        # class_weight =class_weights,
+                        steps_per_epoch=tot_batch_num_train,
+                        validation_steps=tot_batch_num_val,
+                        validation_data=val_gen,
                         shuffle=False)
-
 
 
     model.save('test.hdf5')

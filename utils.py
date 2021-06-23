@@ -7,6 +7,38 @@ import numpy as np
 from sklearn.utils import class_weight
 from model import multi_unet_model
 
+# def DataGenerator(lst, n_classes, dirs):
+#     for im_name in lst:
+#         img = cv2.imread(os.path.join(dirs["im_dir"], im_name)) / 255.0
+#         label = cv2.imread(os.path.join(dirs["label_dir"], im_name), 0)
+#         img = np.array(img)
+#         label = np.array(label)
+#         # train_images = normalize(train_images, axis=1)
+#         label = to_categorical(label, num_classes=n_classes)
+
+#         yield img, label
+
+# class DataGenerator():
+#     def __init__(self, lst, batch_size, n_classes, dirs):
+#         self.lst = lst
+#         self.batch_size = batch_size
+#         self.n_classes = n_classes
+#         self.dirs = dirs
+
+#     def __call__(self):
+
+#         for im_name in self.lst:
+#             img = cv2.imread(os.path.join(self.dirs["im_dir"], im_name)) / 255.0
+#             label = cv2.imread(os.path.join(self.dirs["label_dir"], im_name), 0)
+#             img = np.array(img)
+#             label = np.array(label)
+#             # train_images = normalize(train_images, axis=1)
+#             label = to_categorical(label, num_classes=self.n_classes)
+
+#             yield img, label
+
+
+
 
 class DataGenerator(tf.keras.utils.Sequence):
     def __init__(self, lst, batch_size, n_classes, dirs, shuffle):
@@ -15,6 +47,7 @@ class DataGenerator(tf.keras.utils.Sequence):
         self.n_classes = n_classes
         self.dirs = dirs
         self.shuffle = shuffle
+        self.on_epoch_end()
 
     def __len__(self):
         return int(np.floor(len(self.lst) / self.batch_size))
@@ -25,8 +58,9 @@ class DataGenerator(tf.keras.utils.Sequence):
             np.random.shuffle(self.indexes)
 
     def __getitem__(self, index):
-        indexes = range(0, len(self.lst), self.batch_size)
-        batch_names = self.lst[indexes[index] : indexes[index] + self.batch_size]
+        # indexes = range(0, len(self.lst), self.batch_size)
+        indexes = self.indexes[index * self.batch_size:(index + 1) * self.batch_size]
+        batch_names = [self.lst[k] for k in indexes]
 
         return self.__data_generation(batch_names)
 
@@ -46,6 +80,7 @@ class DataGenerator(tf.keras.utils.Sequence):
         train_labels_cat = to_categorical(train_labels, num_classes=self.n_classes)
 
         return train_images, train_labels_cat
+
 
 
 def weightedLoss(originalLossFunc, weightsList):
