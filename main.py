@@ -10,7 +10,6 @@ if __name__== '__main__':
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(dest = 'mode')
 
-    # yolov5
     train_parser = subparsers.add_parser("train")
     train_parser.add_argument("--img_dir", help="Set in-image_path")
     train_parser.add_argument("--label_dir", help="Set in-image path")

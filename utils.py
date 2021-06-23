@@ -7,39 +7,6 @@ import numpy as np
 from sklearn.utils import class_weight
 from model import multi_unet_model
 
-# def DataGenerator(lst, n_classes, dirs):
-#     for im_name in lst:
-#         img = cv2.imread(os.path.join(dirs["im_dir"], im_name)) / 255.0
-#         label = cv2.imread(os.path.join(dirs["label_dir"], im_name), 0)
-#         img = np.array(img)
-#         label = np.array(label)
-#         # train_images = normalize(train_images, axis=1)
-#         label = to_categorical(label, num_classes=n_classes)
-
-#         yield img, label
-
-# class DataGenerator():
-#     def __init__(self, lst, batch_size, n_classes, dirs):
-#         self.lst = lst
-#         self.batch_size = batch_size
-#         self.n_classes = n_classes
-#         self.dirs = dirs
-
-#     def __call__(self):
-
-#         for im_name in self.lst:
-#             img = cv2.imread(os.path.join(self.dirs["im_dir"], im_name)) / 255.0
-#             label = cv2.imread(os.path.join(self.dirs["label_dir"], im_name), 0)
-#             img = np.array(img)
-#             label = np.array(label)
-#             # train_images = normalize(train_images, axis=1)
-#             label = to_categorical(label, num_classes=self.n_classes)
-
-#             yield img, label
-
-
-
-
 class DataGenerator(tf.keras.utils.Sequence):
     def __init__(self, lst, batch_size, n_classes, dirs, shuffle):
         self.lst = lst
@@ -58,7 +25,6 @@ class DataGenerator(tf.keras.utils.Sequence):
             np.random.shuffle(self.indexes)
 
     def __getitem__(self, index):
-        # indexes = range(0, len(self.lst), self.batch_size)
         indexes = self.indexes[index * self.batch_size:(index + 1) * self.batch_size]
         batch_names = [self.lst[k] for k in indexes]
 
@@ -80,7 +46,6 @@ class DataGenerator(tf.keras.utils.Sequence):
         train_labels_cat = to_categorical(train_labels, num_classes=self.n_classes)
 
         return train_images, train_labels_cat
-
 
 
 def weightedLoss(originalLossFunc, weightsList, mask):
@@ -148,7 +113,7 @@ def read_images(dirs, names, n_classes, compute_cl_weights):
     else:
         return x, y_cat
 
-def get_apci_from_cm(cm, n_classes, mask):
+def get_apri_from_cm(cm, n_classes, mask):
     precision_by_classes, recall_by_classes, IoU_by_classes, accuracy_by_classes = [], [], [], []
 
     FN, FP, TP, TN = 0, 0, 0, 0
@@ -160,7 +125,7 @@ def get_apci_from_cm(cm, n_classes, mask):
                     continue
                 FN += cm[i,j]
                 FP += cm[j,i]
-                
+
             TP = cm[i,i]
             TN = np.trace(cm) - TP - cm[0,0]
 

@@ -1,5 +1,5 @@
 from tensorflow.keras.models import Model
-from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D, UpSampling2D, concatenate, Conv2DTranspose, BatchNormalization, Dropout, Lambda
+from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D, concatenate, Conv2DTranspose, BatchNormalization, Dropout, Lambda
 
 
 def multi_unet_model(n_classes=4, IMG_HEIGHT=256, IMG_WIDTH=256, IMG_CHANNELS=1):
@@ -62,9 +62,8 @@ def multi_unet_model(n_classes=4, IMG_HEIGHT=256, IMG_WIDTH=256, IMG_CHANNELS=1)
 
     model = Model(inputs=[inputs], outputs=[outputs])
 
-    #NOTE: Compile the model in the main program to make it easy to test with various loss functions
-    #model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
-
-    #model.summary()
-
     return model
+
+if __name__ == '__main__':
+    model = multi_unet_model()
+    model.summary()

@@ -1,21 +1,9 @@
-from model import multi_unet_model
-
-import tensorflow as tf
-from tensorflow.keras.utils import normalize, to_categorical
-from tensorflow.keras.metrics import MeanIoU
-import tensorflow.keras.backend as K
-
 import os
-import glob
 import cv2
 import numpy as np
 from matplotlib import pyplot as plt
-from sklearn.preprocessing import LabelEncoder
-from sklearn.utils import class_weight
-from sklearn.model_selection import train_test_split
 from train import get_model
 import matplotlib
-import random
 
 def test(parser_args):
 
