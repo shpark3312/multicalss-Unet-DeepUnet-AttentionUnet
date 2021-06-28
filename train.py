@@ -1,11 +1,10 @@
 
-import tensorflow as tf
-import sys
 import os
 import numpy as np
 from sklearn.model_selection import train_test_split
 from utils import *
 import matplotlib.pyplot as plt
+from tensorflow.keras.losses import categorical_crossentropy
 from datetime import datetime
 
 
@@ -46,7 +45,7 @@ def train(parser_args):
     print(f'train images = {tot_batch_num_train}, validation images = {tot_batch_num_val}')
 
     model = load_model(model_type, n_classes, SIZE_X, SIZE_Y, IMG_CHANNELS)
-    model.compile(loss = weightedLoss(tf.keras.losses.categorical_crossentropy, class_weights, mask), optimizer='adam', metrics = ['accuracy'])
+    model.compile(loss = weightedLoss(categorical_crossentropy, class_weights, mask), optimizer='adam', metrics = ['accuracy'])
 
     model.summary()
 

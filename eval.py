@@ -1,7 +1,6 @@
 from tensorflow.keras.metrics import MeanIoU
 import os
 import numpy as np
-from train import get_model
 import matplotlib
 from utils import *
 
