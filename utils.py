@@ -5,7 +5,8 @@ import os
 import cv2
 import numpy as np
 from sklearn.utils import class_weight
-from model import multi_unet_model
+import sys
+from model import *
 
 class DataGenerator(tf.keras.utils.Sequence):
     def __init__(self, lst, batch_size, n_classes, dirs, shuffle):
@@ -79,11 +80,6 @@ def compute_class_weights(data_y):
     class_weights = class_weight.compute_class_weight('balanced',classes = np.unique(labels_reshaped),y = labels_reshaped)
     print("Class weights are...:", class_weights)
     return class_weights
-
-
-def get_model(n_classes, img_height, img_width, img_channels):
-    return multi_unet_model(n_classes=n_classes, IMG_HEIGHT=img_height, IMG_WIDTH=img_width, IMG_CHANNELS=img_channels)
-
 
 def read_images(dirs, names, n_classes, compute_cl_weights):
 
@@ -161,3 +157,17 @@ def get_apri_from_cm(cm, n_classes, mask):
             accuracy_by_classes.append(accuracy)
 
             print(f"Class {i} | IoU = {IoU:.3f}, Precision = {precision:.3f}, recall = {recall:.3f}, accuracy = {accuracy:.3f}")
+
+
+def load_model(model_type, n_classes, SIZE_X, SIZE_Y, IMG_CHANNELS):
+    if model_type == 'unet':
+        model = get_unet_model(n_classes, SIZE_X, SIZE_Y, IMG_CHANNELS)
+    elif model_type == 'dunet':
+        model = get_dunet_model(n_classes, SIZE_X, SIZE_Y, IMG_CHANNELS).build()
+    elif model_type == 'aunet':
+        model = get_aunet_model(n_classes, SIZE_X, SIZE_Y, IMG_CHANNELS).build()
+    else:
+        print('Possible model types are unet, dunet, aunet')
+        sys.exit()
+
+    return model

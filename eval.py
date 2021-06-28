@@ -15,6 +15,7 @@ def eval(parser_args):
     n_classes = parser_args.class_num
     # save_dir = parser_args.save_dir
     mask = parser_args.mask
+    model_type = parser_args.model_type
 
     plot_img = False
 
@@ -25,7 +26,7 @@ def eval(parser_args):
     im_names = [f for f in os.listdir(dirs['im_dir']) if f[-4:] == ".png"]
     data_X, data_Y = read_images(dirs, im_names, n_classes, compute_cl_weights=False)
 
-    model = get_model(n_classes, SIZE_X, SIZE_Y, IMG_CHANNELS)
+    model = load_model(model_type, n_classes, SIZE_X, SIZE_Y, IMG_CHANNELS)
     model.load_weights(model_path)
 
     y_pred = model.predict(data_X)

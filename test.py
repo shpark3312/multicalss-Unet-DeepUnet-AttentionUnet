@@ -2,8 +2,9 @@ import os
 import cv2
 import numpy as np
 from matplotlib import pyplot as plt
-from train import get_model
 import matplotlib
+
+from utils import load_model
 
 def test(parser_args):
 
@@ -13,6 +14,7 @@ def test(parser_args):
     IMG_CHANNELS = parser_args.img_size[2]
     n_classes = parser_args.class_num
     save_dir = parser_args.save_dir
+    model_type = parser_args.model_type
     plot_img = False
 
     viridis = matplotlib.cm.get_cmap('viridis', 256)
@@ -20,7 +22,7 @@ def test(parser_args):
 
     im_dir = parser_args.img_dir
 
-    model = get_model(n_classes, SIZE_X, SIZE_Y, IMG_CHANNELS)
+    model = load_model(model_type, n_classes, SIZE_X, SIZE_Y, IMG_CHANNELS)
     model.load_weights(model_path)
 
     im_names = [f for f in os.listdir(im_dir) if f[-4:] == ".png"]

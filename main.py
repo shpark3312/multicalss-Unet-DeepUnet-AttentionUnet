@@ -13,6 +13,7 @@ if __name__== '__main__':
     train_parser = subparsers.add_parser("train")
     train_parser.add_argument("--img_dir", help="Set in-image_path")
     train_parser.add_argument("--label_dir", help="Set in-image path")
+    train_parser.add_argument("--model_type", help="Set model type: unet, dunet, aunet")
     train_parser.add_argument('--img-size', nargs='+', type=int, default = [512, 512, 3], help='model input size for training')
     train_parser.add_argument('--epochs', type=int, default=100)
     train_parser.add_argument('--batch_size', type=int, default=16, help='total batch size for all GPUs')

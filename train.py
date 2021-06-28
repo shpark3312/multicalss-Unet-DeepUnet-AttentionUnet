@@ -1,5 +1,6 @@
 
 import tensorflow as tf
+import sys
 import os
 import numpy as np
 from sklearn.model_selection import train_test_split
@@ -19,6 +20,7 @@ def train(parser_args):
     get_class_weights = parser_args.class_weights
     mask = parser_args.mask
     model_dir = parser_args.model_dir
+    model_type = parser_args.model_type
 
     if not os.path.isdir(model_dir):
         os.mkdir(model_dir)
@@ -43,7 +45,7 @@ def train(parser_args):
 
     print(f'train images = {tot_batch_num_train}, validation images = {tot_batch_num_val}')
 
-    model = get_model(n_classes, SIZE_X, SIZE_Y, IMG_CHANNELS)
+    model = load_model(model_type, n_classes, SIZE_X, SIZE_Y, IMG_CHANNELS)
     model.compile(loss = weightedLoss(tf.keras.losses.categorical_crossentropy, class_weights, mask), optimizer='adam', metrics = ['accuracy'])
 
     model.summary()
@@ -60,7 +62,7 @@ def train(parser_args):
                         shuffle=False)
 
 
-    model.save(os.path.join(model_dir, f'{todays_date.year}{todays_date.month:02}{todays_date.day:02}_{todays_date.hour:02}_{todays_date.minute:02}.hdf5'))
+    model.save(os.path.join(model_dir, f'{todays_date.year}{todays_date.month:02}{todays_date.day:02}_{todays_date.hour:02}_{todays_date.minute:02}_{model_type}.hdf5'))
 
     loss = history.history['loss']
     val_loss = history.history['val_loss']
