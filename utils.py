@@ -110,7 +110,7 @@ def read_images(dirs, names, n_classes, compute_cl_weights):
         return x, y_cat
 
 def get_apri_from_cm(cm, n_classes, mask):
-    precision_by_classes, recall_by_classes, IoU_by_classes, accuracy_by_classes = [], [], [], []
+    precision_by_classes, recall_by_classes, IoU_by_classes, accuracy_by_classes, f1_by_classes = [], [], [], [], []
 
     FN, FP, TP, TN = 0, 0, 0, 0
 
@@ -129,13 +129,15 @@ def get_apri_from_cm(cm, n_classes, mask):
             recall = TP/(TP+FN)
             IoU = TP/(TP+FN+FP)
             accuracy = (TP+TN)/(TP+TN+FP+FN)
+            f1 = 2*(recall * precision) / (recall + precision)
 
             precision_by_classes.append(precision)
             recall_by_classes.append(recall)
             IoU_by_classes.append(IoU)
             accuracy_by_classes.append(accuracy)
+            f1_by_classes.append(f1)
 
-            print(f"Class {i} | IoU = {IoU:.3f}, Precision = {precision:.3f}, recall = {recall:.3f}, accuracy = {accuracy:.3f}")
+            print(f"Class {i} | IoU = {IoU:.3f}, Precision = {precision:.3f}, recall = {recall:.3f}, accuracy = {accuracy:.3f}, f1 = {f1:.3f}")
     else:
         for i in range(n_classes):
             for j in range(n_classes):
@@ -150,13 +152,15 @@ def get_apri_from_cm(cm, n_classes, mask):
             recall = TP/(TP+FN)
             IoU = TP/(TP+FN+FP)
             accuracy = (TP+TN)/(TP+TN+FP+FN)
+            f1 = 2*(recall * precision) / (recall + precision)
 
             precision_by_classes.append(precision)
             recall_by_classes.append(recall)
             IoU_by_classes.append(IoU)
             accuracy_by_classes.append(accuracy)
+            f1_by_classes.append(f1)
 
-            print(f"Class {i} | IoU = {IoU:.3f}, Precision = {precision:.3f}, recall = {recall:.3f}, accuracy = {accuracy:.3f}")
+            print(f"Class {i} | IoU = {IoU:.3f}, Precision = {precision:.3f}, recall = {recall:.3f}, accuracy = {accuracy:.3f}, f1 = {f1:.3f}")
 
 
 def load_model(model_type, n_classes, SIZE_X, SIZE_Y, IMG_CHANNELS):
