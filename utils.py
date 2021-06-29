@@ -67,7 +67,7 @@ def weightedLoss(originalLossFunc, weightsList, mask):
         loss *= weightMultiplier
 
         if mask:
-            label_mask = np.where(true == 0, 0, 1)
+            label_mask = np.where(np.argmax(true.numpy(), axis = 3) == 0, 0, 1)
             loss *= label_mask
         return loss
     return lossFunc
@@ -123,7 +123,7 @@ def get_apri_from_cm(cm, n_classes, mask):
                 FP += cm[j,i]
 
             TP = cm[i,i]
-            TN = np.trace(cm) - TP - cm[0,0]
+            TN = np.sum(cm[1:,1:]) - (TP + FN + FP)
 
             precision = TP/(TP+FP)
             recall = TP/(TP+FN)
@@ -146,7 +146,7 @@ def get_apri_from_cm(cm, n_classes, mask):
                 FN += cm[i,j]
                 FP += cm[j,i]
             TP = cm[i,i]
-            TN = np.trace(cm) - TP
+            TN = np.sum(cm) - (TP + FN + FP)
 
             precision = TP/(TP+FP)
             recall = TP/(TP+FN)

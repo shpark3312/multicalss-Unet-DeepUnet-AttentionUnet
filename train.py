@@ -6,7 +6,7 @@ from utils import *
 import matplotlib.pyplot as plt
 from tensorflow.keras.losses import categorical_crossentropy
 from datetime import datetime
-
+import tensorflow as tf
 
 def train(parser_args):
 
@@ -42,15 +42,16 @@ def train(parser_args):
     tot_batch_num_train = int(np.floor(len(train_names) / batch_size))
     tot_batch_num_val = int(np.floor(len(val_names) / batch_size))
 
-    print(f'train images = {tot_batch_num_train}, validation images = {tot_batch_num_val}')
+    print(f'train batches = {tot_batch_num_train}, validation batches = {tot_batch_num_val}')
 
     model = load_model(model_type, n_classes, SIZE_X, SIZE_Y, IMG_CHANNELS)
-    model.compile(loss = weightedLoss(categorical_crossentropy, class_weights, mask), optimizer='adam', metrics = ['accuracy'])
+    tf.config.experimental_run_functions_eagerly(True)
+    model.compile(loss = weightedLoss(categorical_crossentropy, class_weights, mask), run_eagerly=True, optimizer='adam', metrics = ['accuracy'])
 
     model.summary()
 
     train_gen = DataGenerator(train_names, batch_size, n_classes, dirs, shuffle = False)
-    val_gen = DataGenerator(train_names, batch_size, n_classes, dirs, shuffle = False)
+    val_gen = DataGenerator(val_names, batch_size, n_classes, dirs, shuffle = False)
 
     history = model.fit(train_gen,
                         verbose=1,
