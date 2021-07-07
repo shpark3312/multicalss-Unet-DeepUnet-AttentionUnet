@@ -46,7 +46,8 @@ def train(parser_args):
 
     model = load_model(model_type, n_classes, SIZE_X, SIZE_Y, IMG_CHANNELS)
     tf.config.experimental_run_functions_eagerly(True)
-    model.compile(loss = weightedLoss(categorical_crossentropy, class_weights, mask), run_eagerly=True, optimizer='adam', metrics = ['accuracy'])
+    # model.compile(loss = weightedLoss(categorical_crossentropy, class_weights, mask), run_eagerly=True, optimizer='adam', metrics = ['accuracy'])
+    model.compile(loss = weightedLoss(categorical_crossentropy, class_weights, mask), run_eagerly=True, optimizer='adam', metrics=[tf.keras.metrics.Precision(), tf.keras.metrics.Recall()])
 
     model.summary()
 
@@ -60,30 +61,33 @@ def train(parser_args):
                         validation_steps=tot_batch_num_val,
                         validation_data=val_gen,
                         shuffle=False)
+    if get_class_weights:
+        model_filename = f'{todays_date.year}{todays_date.month:02}{todays_date.day:02}_{todays_date.hour:02}_{todays_date.minute:02}_{model_type}_classWeights.hdf5'
+    else:
+        model_filename = f'{todays_date.year}{todays_date.month:02}{todays_date.day:02}_{todays_date.hour:02}_{todays_date.minute:02}_{model_type}.hdf5'
 
+    model.save(os.path.join(model_dir, model_filename))
 
-    model.save(os.path.join(model_dir, f'{todays_date.year}{todays_date.month:02}{todays_date.day:02}_{todays_date.hour:02}_{todays_date.minute:02}_{model_type}.hdf5'))
+    # loss = history.history['loss']
+    # val_loss = history.history['val_loss']
+    # epochs = range(1, len(loss) + 1)
+    # plt.plot(epochs, loss, 'y', label='Training loss')
+    # plt.plot(epochs, val_loss, 'r', label='Validation loss')
+    # plt.title('Training and validation loss')
+    # plt.xlabel('Epochs')
+    # plt.ylabel('Loss')
+    # plt.legend()
+    # plt.show()
 
-    loss = history.history['loss']
-    val_loss = history.history['val_loss']
-    epochs = range(1, len(loss) + 1)
-    plt.plot(epochs, loss, 'y', label='Training loss')
-    plt.plot(epochs, val_loss, 'r', label='Validation loss')
-    plt.title('Training and validation loss')
-    plt.xlabel('Epochs')
-    plt.ylabel('Loss')
-    plt.legend()
-    plt.show()
+    # acc = history.history['acc']
+    # val_acc = history.history['val_acc']
 
-    acc = history.history['acc']
-    val_acc = history.history['val_acc']
-
-    plt.plot(epochs, acc, 'y', label='Training Accuracy')
-    plt.plot(epochs, val_acc, 'r', label='Validation Accuracy')
-    plt.title('Training and validation Accuracy')
-    plt.xlabel('Epochs')
-    plt.ylabel('Accuracy')
-    plt.legend()
-    plt.show()
+    # plt.plot(epochs, acc, 'y', label='Training Accuracy')
+    # plt.plot(epochs, val_acc, 'r', label='Validation Accuracy')
+    # plt.title('Training and validation Accuracy')
+    # plt.xlabel('Epochs')
+    # plt.ylabel('Accuracy')
+    # plt.legend()
+    # plt.show()
 
 # if __name__ == '__main__':

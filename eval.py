@@ -3,7 +3,7 @@ import os
 import numpy as np
 import matplotlib
 from utils import *
-
+from sklearn.model_selection import train_test_split
 
 def eval(parser_args):
 
@@ -23,7 +23,10 @@ def eval(parser_args):
 
     dirs = {'im_dir' : parser_args.img_dir, 'label_dir': parser_args.label_dir}
     im_names = [f for f in os.listdir(dirs['im_dir']) if f[-4:] == ".png"]
-    data_X, data_Y = read_images(dirs, im_names, n_classes, compute_cl_weights=False)
+
+    train_names, val_names = train_test_split(im_names, test_size = 0.2, random_state = 0)
+
+    data_X, data_Y = read_images(dirs, val_names, n_classes, compute_cl_weights=False)
 
     model = load_model(model_type, n_classes, SIZE_X, SIZE_Y, IMG_CHANNELS)
     model.load_weights(model_path)

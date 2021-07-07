@@ -7,6 +7,7 @@ import numpy as np
 from sklearn.utils import class_weight
 import sys
 from model import *
+import matplotlib.pyplot as plt
 
 class DataGenerator(tf.keras.utils.Sequence):
     def __init__(self, lst, batch_size, n_classes, dirs, shuffle):
@@ -94,12 +95,16 @@ def read_images(dirs, names, n_classes, compute_cl_weights):
         if np.sum(label) != 0:
             x.append(img)
             y.append(label)
+            # plt.imshow(label)
+            # plt.show()
             i += 1
 
     print(f'total data : {i}')
 
     x = np.asarray(x)
     y = np.asarray(y)
+
+    x = normalize(x, axis=1)
 
     y_cat = to_categorical(y, num_classes=n_classes)
 
