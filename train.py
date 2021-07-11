@@ -5,7 +5,7 @@ from sklearn.model_selection import train_test_split
 from utils import *
 import matplotlib.pyplot as plt
 from tensorflow.keras.losses import categorical_crossentropy
-from tensorflow.keras.metrics import Precision, Recall
+from tensorflow.keras.metrics import Precision, Recall, Accuracy
 from datetime import datetime
 import tensorflow as tf
 
@@ -49,7 +49,7 @@ def train(parser_args):
     tf.config.experimental_run_functions_eagerly(True)
     # model.compile(loss = weightedLoss(categorical_crossentropy, class_weights, mask), run_eagerly=True, optimizer='adam', metrics = ['accuracy'])
 
-    metric_per_class = [Recall(class_id=i) for i in range(n_classes)] +  [Precision(class_id=i) for i in range(n_classes)]
+    metric_per_class = [Recall(class_id=i) for i in range(n_classes)] +  [Precision(class_id=i) for i in range(n_classes)] + [Accuracy()]
     model.compile(loss = weightedLoss(categorical_crossentropy, class_weights, mask), run_eagerly=True, optimizer='adam', metrics=metric_per_class)
 
     model.summary()
