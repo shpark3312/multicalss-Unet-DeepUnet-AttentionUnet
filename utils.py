@@ -8,6 +8,7 @@ from sklearn.utils import class_weight
 import sys
 from model import *
 import matplotlib.pyplot as plt
+from osgeo import gdal
 
 class DataGenerator(tf.keras.utils.Sequence):
     def __init__(self, lst, batch_size, n_classes, dirs, shuffle):
@@ -37,8 +38,19 @@ class DataGenerator(tf.keras.utils.Sequence):
         train_images, train_labels = [], []
 
         for im_name in batch_names:
-            img = cv2.imread(os.path.join(self.dirs["im_dir"], im_name))
-            label = cv2.imread(os.path.join(self.dirs["label_dir"], im_name), 0)
+            if os.path.splitext(im_name)[-1].lower() == 'tif':
+                img = gdal.Open(os.path.join(self.dirs['im_dir'], im_name))
+                img = img.ReadAsArray()
+                img = img/255.0
+                img = np.transpose(img, (1, 2, 0))[...,:4]
+
+                label = gdal.Open(os.path.join(self.dirs['label_dir'], im_name))
+                label = label.ReadAsArray()
+
+            else:
+                img = cv2.imread(os.path.join(self.dirs["im_dir"], im_name))
+                label = cv2.imread(os.path.join(self.dirs["label_dir"], im_name), 0)
+
             train_images.append(img)
             train_labels.append(label)
 
@@ -88,9 +100,20 @@ def read_images(dirs, names, n_classes, compute_cl_weights):
     y = []
     i = 0
 
-    for name in names:
-        img = cv2.imread(os.path.join(dirs['im_dir'], name)) / 255.0
-        label = cv2.imread(os.path.join(dirs['label_dir'], name), 0)
+    for im_name in names:
+        if os.path.splitext(im_name)[-1].lower() == 'tif':
+            img = gdal.Open(os.path.join(dirs['im_dir'], im_name))
+            img = img.ReadAsArray()
+            img = img/255.0
+            img = np.transpose(img, (1, 2, 0))[...,:4]
+
+            label = gdal.Open(os.path.join(dirs['label_dir'], im_name))
+            label = label.ReadAsArray()
+
+        else:
+            img = cv2.imread(os.path.join(dirs["im_dir"], im_name))
+            label = cv2.imread(os.path.join(dirs["label_dir"], im_name), 0)
+
 
         if np.sum(label) != 0:
             x.append(img)
@@ -105,7 +128,6 @@ def read_images(dirs, names, n_classes, compute_cl_weights):
     y = np.asarray(y)
 
     x = normalize(x, axis=1)
-
     y_cat = to_categorical(y, num_classes=n_classes)
 
     if compute_cl_weights:

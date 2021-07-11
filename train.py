@@ -5,6 +5,7 @@ from sklearn.model_selection import train_test_split
 from utils import *
 import matplotlib.pyplot as plt
 from tensorflow.keras.losses import categorical_crossentropy
+from tensorflow.keras.metrics import Precision, Recall
 from datetime import datetime
 import tensorflow as tf
 
@@ -47,7 +48,9 @@ def train(parser_args):
     model = load_model(model_type, n_classes, SIZE_X, SIZE_Y, IMG_CHANNELS)
     tf.config.experimental_run_functions_eagerly(True)
     # model.compile(loss = weightedLoss(categorical_crossentropy, class_weights, mask), run_eagerly=True, optimizer='adam', metrics = ['accuracy'])
-    model.compile(loss = weightedLoss(categorical_crossentropy, class_weights, mask), run_eagerly=True, optimizer='adam', metrics=[tf.keras.metrics.Precision(), tf.keras.metrics.Recall()])
+
+    metric_per_class = [Recall(class_id=i) for i in range(n_classes)] +  [Precision(class_id=i) for i in range(n_classes)]
+    model.compile(loss = weightedLoss(categorical_crossentropy, class_weights, mask), run_eagerly=True, optimizer='adam', metrics=metric_per_class)
 
     model.summary()
 

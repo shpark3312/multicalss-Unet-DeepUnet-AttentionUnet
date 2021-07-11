@@ -15,21 +15,26 @@ def test(parser_args):
     n_classes = parser_args.class_num
     save_dir = parser_args.save_dir
     model_type = parser_args.model_type
+    im_dir = parser_args.img_dir
+    # plot_img = True
     plot_img = False
 
     viridis = matplotlib.cm.get_cmap('viridis', 256)
     COLORS = viridis(np.linspace(0, 1, n_classes))[...,:3]
-
-    im_dir = parser_args.img_dir
 
     model = load_model(model_type, n_classes, SIZE_X, SIZE_Y, IMG_CHANNELS)
     model.load_weights(model_path)
 
     im_names = [f for f in os.listdir(im_dir) if f[-4:] == ".png"]
 
+    full_save_dir = os.path.join(save_dir, os.path.split(model_path)[-1].split(".")[0])
+
+    if not os.path.isdir(full_save_dir):
+        os.mkdir(full_save_dir)
+
     for n in im_names:
 
-        save_path = os.path.join(save_dir, f'{n[:-4]}_mask.{n[-3:]}')
+        save_path = os.path.join(full_save_dir, f'{n[:-4]}_mask.{n[-3:]}')
 
         X_test = cv2.imread(os.path.join(im_dir, n)) / 255.0
 
@@ -45,7 +50,7 @@ def test(parser_args):
                 res_mask[i,j] = COLORS[y_pred_argmax[0,i,j]]
                 # label_color[i,j] = COLORS[label[i,j]]
 
-        cv2.imwrite(save_path, res_mask)
+        plt.imsave(save_path, res_mask)
 
         if plot_img:
             plt.subplot(221)
@@ -55,6 +60,7 @@ def test(parser_args):
             plt.subplot(222)
             plt.title('prediction')
             plt.imshow(res_mask)
+            plt.show()
 
             # plt.subplot(223)
             # plt.title('GT label')
