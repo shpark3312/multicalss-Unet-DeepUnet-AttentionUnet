@@ -1,9 +1,10 @@
-from tensorflow.keras.metrics import MeanIoU
+# from tensorflow.keras.metrics import MeanIoU
 import os
 import numpy as np
 import matplotlib
-from utils import *
+from utils import load_model, read_images, get_apri_from_cm
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import confusion_matrix
 
 def eval(parser_args):
 
@@ -35,10 +36,8 @@ def eval(parser_args):
     y_pred_argmax = np.argmax(y_pred, axis=3)
     data_Y = np.argmax(data_Y, axis=3)
 
-    IOU_keras = MeanIoU(num_classes=n_classes)
-    IOU_keras.update_state(data_Y, y_pred_argmax)
+    cm = confusion_matrix(data_Y.ravel(), y_pred_argmax.ravel())
 
-    cm = np.array(IOU_keras.get_weights()).reshape(n_classes, n_classes)
-    print(cm)
+    print('confusion metrics = \n', cm)
 
     get_apri_from_cm(cm, n_classes, mask)
