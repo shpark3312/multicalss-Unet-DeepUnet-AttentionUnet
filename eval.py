@@ -5,7 +5,7 @@ import matplotlib
 from utils import load_model, read_images, get_apri_from_cm
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix
-from sklearn.metrics import classification_report
+# from sklearn.metrics import classification_report
 
 def eval(parser_args):
 

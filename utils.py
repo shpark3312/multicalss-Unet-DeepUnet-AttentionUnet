@@ -155,7 +155,11 @@ def get_apri_from_cm(cm, n_classes, mask):
     f1 = 2*(recall * precision) / (recall + precision)
 
     for i in range(n_classes):
-        print(f"Class {i} | IoU = {IoU[i]:.3f}, Precision = {precision[i]:.3f}, recall = {recall[i]:.3f}, accuracy = {accuracy[i]:.3f}, f1 = {f1[i]:.3f}")
+        if mask:
+
+            print(f"Class {i+1} | IoU = {IoU[i]:.3f}, Precision = {precision[i]:.3f}, recall = {recall[i]:.3f}, accuracy = {accuracy[i]:.3f}, f1 = {f1[i]:.3f}")
+        else:
+            print(f"Class {i} | IoU = {IoU[i]:.3f}, Precision = {precision[i]:.3f}, recall = {recall[i]:.3f}, accuracy = {accuracy[i]:.3f}, f1 = {f1[i]:.3f}")
 
 
 
