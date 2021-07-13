@@ -5,6 +5,7 @@ import matplotlib
 from utils import load_model, read_images, get_apri_from_cm
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix
+from sklearn.metrics import classification_report
 
 def eval(parser_args):
 
@@ -17,15 +18,10 @@ def eval(parser_args):
     mask = parser_args.mask
     model_type = parser_args.model_type
 
-    plot_img = False
-
-    viridis = matplotlib.cm.get_cmap('viridis', 256)
-    COLORS = viridis(np.linspace(0, 1, n_classes))[...,:3]
-
     dirs = {'im_dir' : parser_args.img_dir, 'label_dir': parser_args.label_dir}
     im_names = [f for f in os.listdir(dirs['im_dir']) if f[-4:] == ".png"]
 
-    train_names, val_names = train_test_split(im_names, test_size = 0.2, random_state = 0)
+    _, val_names = train_test_split(im_names, test_size = 0.2, random_state = 0)
 
     data_X, data_Y = read_images(dirs, val_names, n_classes, compute_cl_weights=False)
 
