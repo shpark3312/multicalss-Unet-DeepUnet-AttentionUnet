@@ -25,7 +25,7 @@ def train(parser_args):
     if not os.path.isdir(model_dir):
         os.mkdir(model_dir)
 
-    todays_date = datetime.now()
+
     dirs = {'im_dir' : parser_args.img_dir, 'label_dir': parser_args.label_dir}
 
     im_names = [f for f in os.listdir(dirs['im_dir']) if f[-4:] == ".png"]
@@ -54,8 +54,8 @@ def train(parser_args):
 
     model.summary()
 
-    train_gen = DataGenerator(train_names, batch_size, n_classes, dirs, shuffle = False)
-    val_gen = DataGenerator(val_names, batch_size, n_classes, dirs, shuffle = False)
+    train_gen = DataGenerator(train_names, batch_size, n_classes, dirs, mask, shuffle = False)
+    val_gen = DataGenerator(val_names, batch_size, n_classes, dirs, mask, shuffle = False)
 
     history = model.fit(train_gen,
                         verbose=1,

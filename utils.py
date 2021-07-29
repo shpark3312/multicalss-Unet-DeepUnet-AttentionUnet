@@ -10,12 +10,33 @@ from model import *
 import matplotlib.pyplot as plt
 from osgeo import gdal
 
+def to_onehot(y, num_classes, mask, dtype='float32'):
+    y = np.array(y, dtype='int')
+    input_shape = y.shape
+    if input_shape and input_shape[-1] == 1 and len(input_shape) > 1:
+        input_shape = tuple(input_shape[:-1])
+    y = y.ravel()
+    if not num_classes:
+        num_classes = np.max(y) + 1
+    n = y.shape[0]
+    categorical = np.zeros((n, num_classes), dtype=dtype)
+    categorical[np.arange(n), y] = 1
+    output_shape = input_shape + (num_classes,)
+    categorical = np.reshape(categorical, output_shape)
+
+    if mask:
+        categorical = categorical[:,:,:,1:]
+
+    return categorical
+
+
 class DataGenerator(tf.keras.utils.Sequence):
-    def __init__(self, lst, batch_size, n_classes, dirs, shuffle):
+    def __init__(self, lst, batch_size, n_classes, dirs, mask, shuffle):
         self.lst = lst
         self.batch_size = batch_size
         self.n_classes = n_classes
         self.dirs = dirs
+        self.mask = mask
         self.shuffle = shuffle
         self.on_epoch_end()
 
@@ -51,13 +72,19 @@ class DataGenerator(tf.keras.utils.Sequence):
                 img = cv2.imread(os.path.join(self.dirs["im_dir"], im_name))
                 label = cv2.imread(os.path.join(self.dirs["label_dir"], im_name), 0)
 
+
             train_images.append(img)
             train_labels.append(label)
 
         train_images = np.array(train_images)
         train_labels = np.array(train_labels)
         train_images = normalize(train_images, axis=1)
-        train_labels_cat = to_categorical(train_labels, num_classes=self.n_classes)
+
+        if self.mask:
+            train_labels_cat = to_onehot(train_labels, self.n_classes+1, self.mask)
+        else:
+            train_labels_cat = to_onehot(train_labels, self.n_classes, self.mask)
+        # train_labels_cat = to_categorical(train_labels, num_classes=self.n_classes)
 
         return train_images, train_labels_cat
 
@@ -160,6 +187,8 @@ def get_apri_from_cm(cm, n_classes, mask):
             print(f"Class {i+1} | IoU = {IoU[i]:.3f}, Precision = {precision[i]:.3f}, recall = {recall[i]:.3f}, accuracy = {accuracy[i]:.3f}, f1 = {f1[i]:.3f}")
         else:
             print(f"Class {i} | IoU = {IoU[i]:.3f}, Precision = {precision[i]:.3f}, recall = {recall[i]:.3f}, accuracy = {accuracy[i]:.3f}, f1 = {f1[i]:.3f}")
+
+    return precision, recall, IoU, accuracy, f1
 
 
 

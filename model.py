@@ -8,6 +8,7 @@ def get_unet_model(n_classes=4, IMG_HEIGHT=256, IMG_WIDTH=256, IMG_CHANNELS=1):
     inputs = Input((IMG_HEIGHT, IMG_WIDTH, IMG_CHANNELS))
     s = inputs
 
+
     c0 = Conv2D(16, (3, 3), activation='relu', kernel_initializer='he_normal', padding='same')(s)
     c0 = Conv2D(16, (3, 3), activation='relu', kernel_initializer='he_normal', padding='same')(c0)
     p0 = MaxPooling2D((2, 2))(c0)
@@ -61,8 +62,8 @@ class get_dunet_model():
         self.IMG_HEIGHT = IMG_HEIGHT
         self.IMG_WIDTH = IMG_WIDTH
         self.IMG_CHANNELS = IMG_CHANNELS
-        self.filter_num = 64
-        # self.filter_num = 128
+        # self.filter_num = 64
+        self.filter_num = 256
 
     def encoder_layer(self, x):
         p = Activation('relu')(x)

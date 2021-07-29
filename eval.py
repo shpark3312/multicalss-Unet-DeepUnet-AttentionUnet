@@ -36,4 +36,17 @@ def eval(parser_args):
 
     print('confusion metrics = \n', cm)
 
-    get_apri_from_cm(cm, n_classes, mask)
+    precision, recall, IoU, accuracy, f1 = get_apri_from_cm(cm, n_classes, mask)
+
+    if mask:
+        n_classes -= 1
+
+    f = open(f'results/{os.path.splitext(os.path.split(model_path)[-1])[0]}.csv', 'w')
+    f.write("Class,IoU,Precision,recall,accuracy,f1\n")
+
+    for i in range(n_classes):
+        if mask:
+            f.write(f"{i+1},{IoU[i]:.3f},{precision[i]:.3f},{recall[i]:.3f},{accuracy[i]:.3f},{f1[i]:.3f}\n")
+        else:
+            f.write(f"{i},{IoU[i]:.3f},{precision[i]:.3f},{recall[i]:.3f},{accuracy[i]:.3f},{f1[i]:.3f}\n")
+    return
